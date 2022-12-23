@@ -38,11 +38,10 @@
 </template>
 
 <script setup>
+import { register, login } from '@/api/index.js'
 import { ref, reactive, toRefs, onMounted } from "vue"
 import { showNotify, showToast } from 'vant';
-import http from '../../api/http.js'
 import Identify from "../../components/Identify.vue"
-import md5 from 'js-md5';
 import { useRouter } from 'vue-router'
 let router = useRouter();
 
@@ -62,27 +61,23 @@ let onSubmit = (obj) => {
     }
     else{
         if (userInfo.isTitle) {
-        http.post('/user/login', {
-            loginName: obj.用户名 ,
-            passwordMd5: md5(obj.密码)
-        }).then(res => {
+        login(userInfo.username, userInfo.password).then(res => {
             if (res.resultCode == 200) {
+                localStorage.setItem("mltoken", res.data)
                 router.replace({ path: '/user' });
+                showNotify({
+                    type: 'success',
+                    message: "登录成功"
+                });
             }
         })
     }
     else {
-        http.post('/user/register', {
-            loginName: userInfo.username,
-            password: userInfo.password
-        }).then(res => {
-            if (res.resultCode == 500) {
-                showNotify(res.message);
-            }
-            else {
-                showNotify({ type: 'success', message: res.message });
-                userInfo.isTitle = false;
-            }
+            register(userInfo.username, userInfo.password).then(res => {
+                if (res.resultCode == 200) {
+                    showNotify({ type: 'success', message: res.message });
+                    userInfo.isTitle = true;
+                }   
         })
         }
     }

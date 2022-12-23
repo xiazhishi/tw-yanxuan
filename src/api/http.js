@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {
-    Notify
+    showNotify
 } from "vant"
 
 let http = axios.create({
@@ -21,6 +21,13 @@ http.interceptors.request.use(config => {
 
 http.interceptors.response.use(response => {
     let data = response.data;
+    if (data.resultCode != 200) {
+        // 代码走到这里,说明数据不是我们需要的,给出提示
+        showNotify({
+            type: 'danger',
+            message: data.message || '系统繁忙'
+        });
+    }
     return data;
 }, err => {
     Notify({
