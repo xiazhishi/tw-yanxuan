@@ -30,7 +30,7 @@ http.interceptors.response.use(response => {
     }
     return data;
 }, err => {
-    Notify({
+    showNotify({
         type: "danger",
         message: "系统繁忙,稍后再试"
     })
